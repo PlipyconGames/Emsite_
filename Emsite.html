@@ -110,7 +110,7 @@
     .b-tp { border: 3px solid #00ffff; animation: anim-tp 2s infinite alternate; }
     .b-rainbow { border: 3px solid red; animation: anim-rainbow 3s linear infinite; }
     
-    /* NEW BORDERS: Rube's Ruby & Duke */
+    /* BORDERS: Rube's Ruby & Duke */
     .b-rubes-ruby { border: 3px solid #ff0033; box-shadow: 0 0 10px #ff0033, inset 0 0 5px #ff0033; animation: anim-ruby-shine 1.5s infinite alternate; }
     .b-duke { border: 3px solid #ffcc00; border-bottom-color: #777777; border-left-color: #777777; }
 
@@ -147,7 +147,7 @@
     .u-cyan { color: #00ffff; font-weight: bold; }
     .u-lime { color: #a6ff00; font-weight: bold; }
 
-    /* NEW USERNAME STYLE: Ember Lord */
+    /* USERNAME STYLE: Ember Lord */
     .u-ember-lord { 
       font-family: "Georgia", serif; 
       font-weight: bold; 
@@ -186,6 +186,8 @@
     button.primary:hover { background: #e64d00; }
     button.danger { background: #cc0000; color: white; border-color: #990000; }
     button.danger:hover { background: #ee0000; }
+    button.success { background: #009944; color: white; border-color: #006622; font-weight: bold; }
+    button.success:hover { background: #00b350; }
     
     input, textarea, select { padding: 6px; background: #181818; color: #ffffff; border: 1px solid #444444; border-radius: 2px; width: 100%; margin-bottom: 8px; }
     input::placeholder, textarea::placeholder { color: #777777; }
@@ -203,9 +205,12 @@
     .fav-star { position: absolute; top: 12px; right: 12px; font-size: 16px; color: #777; cursor: pointer; z-index: 2; }
     .fav-star.active { color: #ffd700; }
 
-    .users-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 15px; }
-    .user-card { border: 1px solid var(--border-color); padding: 12px; background: var(--card-inner); cursor: pointer; display: flex; align-items: center; gap: 12px; }
+    .users-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-top: 15px; }
+    .user-card { border: 1px solid var(--border-color); padding: 12px; background: var(--card-inner); display: flex; flex-direction: column; gap: 10px; }
     .user-card:hover { border-color: var(--accent); background: #2d2d2d; }
+    .user-card-header { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .user-card-actions { display: flex; gap: 6px; margin-top: 4px; }
+    .user-card-actions button { font-size: 10px; padding: 4px 8px; flex: 1; }
 
     /* Tables */
     table.data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -334,7 +339,7 @@
       <!-- Page: Community Users Directory -->
       <section id="usersPage" style="display: none;">
         <h3>Emsite User Directory</h3>
-        <p style="color: var(--text-muted); font-size: 11px; margin-top: 4px; margin-bottom: 15px;">Search and explore profiles in the community.</p>
+        <p style="color: var(--text-muted); font-size: 11px; margin-top: 4px; margin-bottom: 15px;">Search, friend, and gift embers to users in the community.</p>
 
         <div style="display: flex; gap: 10px; max-width: 600px;">
           <input type="text" id="userSearchInput" placeholder="Search by username..." oninput="renderUsersList()" style="margin-bottom:0;" />
@@ -352,7 +357,10 @@
       <section id="profilePage" style="display: none;">
         <div id="profileHeaderArea" style="display: flex; justify-content: space-between; align-items: center;">
           <h3 id="profileViewHeading">Your Account Dashboard</h3>
-          <button id="reportUserBtn" class="danger" style="display: none;" onclick="openReportModal()">🚩 Report User</button>
+          <div style="display:flex; gap: 8px;">
+            <div id="profileActionBtns"></div>
+            <button id="reportUserBtn" class="danger" style="display: none;" onclick="openReportModal()">🚩 Report User</button>
+          </div>
         </div>
         
         <div style="display: flex; gap: 20px; margin-top: 15px; align-items: flex-start;">
@@ -382,6 +390,12 @@
             <button id="saveBioBtn" class="primary" onclick="saveBio()">Save Bio</button>
           </div>
           <p id="publicBioText" style="color: #aaa; background: #1a1a1a; padding: 10px; border: 1px solid #333; border-radius: 3px; display: none;"></p>
+        </div>
+
+        <!-- Friends List Section -->
+        <div style="margin-top: 25px;">
+          <h4>Friends List</h4>
+          <div id="profileFriendsList" style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
         </div>
 
         <!-- Created Games & Embers Breakdown Section -->
@@ -597,7 +611,91 @@
     </div>
   </div>
 
+  <!-- Ember Purchase Modal (Payments Simulated) -->
+  <div class="modal-overlay" id="emberPurchaseModal">
+    <div class="modal">
+      <h2 style="font-family: sans-serif; color: #ff5500;">Buy Embers 🔥</h2>
+      
+      <!-- Step 1: Offer Details -->
+      <div id="purchaseStep1">
+        <p style="font-size: 14px; margin-bottom: 12px; color: #fff; font-weight: bold;">
+          Special Offer: Get 1000 Embers 🔥 for only $1.50
+        </p>
+        <p style="font-size: 11px; margin-bottom: 15px; color: var(--text-muted);">
+          Boost your account and unlock exclusive cosmetics, badges, and the ability to gift more to friends!
+        </p>
+        <button class="primary" style="width: 100%;" onclick="startPurchaseFlow()">Buy Now!</button>
+      </div>
+
+      <!-- Step 2: Simulated Checkout -->
+      <div id="purchaseStep2" style="display: none;">
+        <p style="font-size: 11px; margin-bottom: 12px; color: var(--text-muted);">
+          Secure checkout powered by <b style="color:#fff;">Emsite Payments</b>.
+        </p>
+        <p style="font-size: 12px; margin-bottom: 15px; color: #aaa;">
+          A new window should have opened for your payment. After completing the transaction, click the button below to confirm.
+        </p>
+        <button class="success" style="width: 100%;" onclick="completeSimulatedPurchase()">Confirm Purchase (Simulated)</button>
+      </div>
+      
+      <button onclick="closeEmberPurchaseModal()" style="width: 100%; margin-top: 8px;">Cancel</button>
+    </div>
+  </div>
+
   <script>
+    // --- EMSITE ENCRYPTION UTILITIES ---
+    // CUSTOM STORAGE crypto implementation: Numeric -> Alphabetic -> Caesar Cipher
+    const EmsiteCrypto = (() => {
+      const DIGIT_MAP = "BAFCHDEIJG"; // Standard 0-9 to unique letter mapping (fixed map)
+      const REVERSE_DIGIT_MAP = DIGIT_MAP.split('').reduce((obj, char, idx) => { obj[char] = idx.toString(); return obj; }, {});
+      const SHIFT_AMOUNT = 7; // Caesar Shift Amount (fixed secret key)
+
+      function applyCaesarShift(str, shift) {
+        return str.split('').map(char => {
+          const code = char.charCodeAt(0);
+          if (code >= 65 && code <= 90) { // A-Z
+            return String.fromCharCode(((code - 65 + shift) % 26) + 65);
+          }
+          return char; // Non-alphabetic characters remain unchanged
+        }).join('');
+      }
+
+      function reverseCaesarShift(str, shift) {
+        // Shifting backward, handling negative modulo: % 26 + 26
+        return applyCaesarShift(str, (26 - (shift % 26)) % 26);
+      }
+
+      // Encrypt sequence: Numeric -> Alphabetic string -> Caesar Shift
+      function encryptNumber(num) {
+        if (typeof num !== 'number' || num < 0 || !Number.isInteger(num)) return null;
+        
+        // 1. Numeric -> Alphabetic (via mapping)
+        const alphabeticDigits = num.toString().split('').map(digit => DIGIT_MAP[parseInt(digit)]).join('');
+        
+        // 2. Alphabetic string -> Caesar Shift
+        const encryptedString = applyCaesarShift(alphabeticDigits, SHIFT_AMOUNT);
+        return encryptedString;
+      }
+
+      // Decrypt sequence: Reverse Caesar Shift -> Intermediate Alphabetic string -> Numeric value
+      function decryptToNumber(encryptedString) {
+        if (typeof encryptedString !== 'string') return 0; // Standard fallback for economy data
+
+        // 1. Reverse Caesar Shift
+        const decryptedAlphabetic = reverseCaesarShift(encryptedString, SHIFT_AMOUNT);
+
+        // 2. Intermediate Alphabetic string -> Numeric (via mapping)
+        const decryptedNumericString = decryptedAlphabetic.split('').map(char => REVERSE_DIGIT_MAP[char] || '').join('');
+
+        // Standard validation: Ensure we produced a non-empty string and a safe integer
+        if (!decryptedNumericString) return 0;
+        const finalNumber = parseInt(decryptedNumericString);
+        return (!isNaN(finalNumber) && finalNumber >= 0) ? finalNumber : 0;
+      }
+
+      return { encrypt: encryptNumber, decrypt: decryptToNumber };
+    })();
+
     // --- EMAILJS CONFIGURATION ---
     const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
     const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
@@ -621,6 +719,9 @@
     let equippedBgStyle = '';
     let userBadges = [];
     let favoritedGameIds = [];
+    let friendsList = [];
+    let friendRequestsSent = [];
+    let friendRequestsReceived = [];
     let generated7DigitCode = '';
 
     // Active Profile Target Variable
@@ -649,6 +750,9 @@
       equippedBgStyle = '';
       userBadges = [];
       favoritedGameIds = [];
+      friendsList = [];
+      friendRequestsSent = [];
+      friendRequestsReceived = [];
     }
 
     function registerUserGlobal(username, pin = null) {
@@ -674,6 +778,7 @@
       registerUserGlobal('Emsite', '12345');
     }
 
+    // UPDATE: saveUserData now integrates custom encryption utility object
     function saveUserData() {
       if (!currentUser) return;
       
@@ -681,11 +786,14 @@
         userBadges.push('bdg-founder');
       }
 
+      // INTEGRATION: Standard numeric field (embers) is now encrypted before storage
+      const encryptedEmbers = EmsiteCrypto.encrypt(embers);
+
       const userData = {
         username: currentUser,
         bio: userBio,
         profilePicUrl: profilePicUrl,
-        embers: embers,
+        embers: encryptedEmbers, // Standard economy data field now encrypted string
         loginStreak: loginStreak,
         claimedStreakToday: claimedStreakToday,
         redeemedCodes: redeemedCodes,
@@ -694,7 +802,10 @@
         equippedCommentFx: equippedCommentFx,
         equippedBgStyle: equippedBgStyle,
         userBadges: userBadges,
-        favoritedGameIds: favoritedGameIds
+        favoritedGameIds: favoritedGameIds,
+        friendsList: friendsList,
+        friendRequestsSent: friendRequestsSent,
+        friendRequestsReceived: friendRequestsReceived
       };
       
       registerUserGlobal(currentUser);
@@ -702,6 +813,7 @@
       localStorage.setItem('emsite_user_' + currentUser.toLowerCase(), JSON.stringify(userData));
     }
 
+    // UPDATE: loadUserData now integrates decryption sequence for standard fields
     function loadUserData(usernameToLoad = null) {
       const activeUser = usernameToLoad || localStorage.getItem('emsite_active_user');
       if (!activeUser) {
@@ -717,7 +829,10 @@
           currentUser = data.username || activeUser;
           userBio = data.bio || "No bio set.";
           profilePicUrl = data.profilePicUrl || null;
-          embers = data.embers !== undefined ? data.embers : 0;
+          
+          // INTEGRATION: Decrypt intermediate string to standard numeric value
+          embers = EmsiteCrypto.decrypt(data.embers);
+          
           loginStreak = data.loginStreak || 1;
           claimedStreakToday = data.claimedStreakToday || false;
           redeemedCodes = data.redeemedCodes || [];
@@ -727,6 +842,9 @@
           equippedBgStyle = data.equippedBgStyle || '';
           userBadges = data.userBadges || [];
           favoritedGameIds = data.favoritedGameIds || [];
+          friendsList = data.friendsList || [];
+          friendRequestsSent = data.friendRequestsSent || [];
+          friendRequestsReceived = data.friendRequestsReceived || [];
         } catch (e) {
           currentUser = activeUser;
           resetUserState();
@@ -953,6 +1071,117 @@
       }
     }
 
+    /* FRIEND SYSTEM HELPERS */
+    // UPDATE: Utility now utilizes decryption utility internally
+    function getUserDataRaw(username) {
+      const saved = localStorage.getItem('emsite_user_' + username.toLowerCase());
+      if (saved) {
+        try { 
+          const rawData = JSON.parse(saved);
+          
+          // INTEGRATION: Standard economy field decrypted string back to intermediate value
+          rawData.embers = EmsiteCrypto.decrypt(rawData.embers);
+          
+          return rawData; 
+        } catch(e){}
+      }
+      return null;
+    }
+
+    // UPDATE: Utility utilizes decryption intermediate string internally
+    function saveUserDataRaw(username, data) {
+      // INTEGRATION: Pre-save field encryption string intermediate numeric value
+      if (typeof data.embers === 'number') {
+        data.embers = EmsiteCrypto.encrypt(data.embers);
+      }
+      
+      localStorage.setItem('emsite_user_' + username.toLowerCase(), JSON.stringify(data));
+    }
+
+    function sendFriendRequest(targetUsername) {
+      if (!currentUser) return alert('Please log in to add friends.');
+      if (targetUsername.toLowerCase() === currentUser.toLowerCase()) return;
+
+      if (friendsList.includes(targetUsername)) return alert('You are already friends!');
+      if (friendRequestsSent.includes(targetUsername)) return alert('Friend request already sent!');
+
+      let targetData = getUserDataRaw(targetUsername);
+      if (!targetData) targetData = { username: targetUsername, embers: 0 }; // Decrypted state is numeric standardeconomy data field initial state
+
+      targetData.friendRequestsReceived = targetData.friendRequestsReceived || [];
+      if (!targetData.friendRequestsReceived.includes(currentUser)) {
+        targetData.friendRequestsReceived.push(currentUser);
+        saveUserDataRaw(targetUsername, targetData);
+      }
+
+      friendRequestsSent.push(targetUsername);
+      saveUserData();
+      alert(`Friend request sent to ${targetUsername}!`);
+
+      if (currentlyViewingUser && currentlyViewingUser.toLowerCase() === targetUsername.toLowerCase()) {
+        viewUserProfile(targetUsername);
+      }
+      if (document.getElementById('usersPage').style.display !== 'none') {
+        renderUsersList();
+      }
+    }
+
+    function acceptFriendRequest(targetUsername) {
+      if (!currentUser) return;
+
+      friendRequestsReceived = friendRequestsReceived.filter(u => u.toLowerCase() !== targetUsername.toLowerCase());
+      if (!friendsList.includes(targetUsername)) friendsList.push(targetUsername);
+      saveUserData();
+
+      let targetData = getUserDataRaw(targetUsername);
+      if (targetData) {
+        targetData.friendRequestsSent = (targetData.friendRequestsSent || []).filter(u => u.toLowerCase() !== currentUser.toLowerCase());
+        targetData.friendsList = targetData.friendsList || [];
+        if (!targetData.friendsList.includes(currentUser)) {
+          targetData.friendsList.push(currentUser);
+        }
+        saveUserDataRaw(targetUsername, targetData);
+      }
+
+      alert(`You and ${targetUsername} are now friends!`);
+
+      if (currentlyViewingUser) {
+        viewUserProfile(currentlyViewingUser);
+      }
+      if (document.getElementById('usersPage').style.display !== 'none') {
+        renderUsersList();
+      }
+    }
+
+    function giftEmbers(targetUsername) {
+      if (!currentUser) return alert('Please log in to gift embers.');
+      if (targetUsername.toLowerCase() === currentUser.toLowerCase()) return alert('You cannot gift yourself!');
+
+      const isFriend = friendsList.includes(targetUsername);
+      const maxGift = isFriend ? 5000 : 1000;
+
+      let amountStr = prompt(`How many Embers would you like to gift to ${targetUsername}?\n(Max limit: ${maxGift} Embers ${isFriend ? '[Friends Boost]' : '[Non-Friend Limit]'})`);
+      if (!amountStr) return;
+
+      let amount = parseInt(amountStr);
+      if (isNaN(amount) || amount <= 0) return alert('Please enter a valid Ember amount.');
+      if (amount > maxGift) return alert(`Gift limit exceeded! You can gift up to ${maxGift} Embers to ${isFriend ? 'friends' : 'non-friends'}.`);
+      if (embers < amount) return alert('You do not have enough Embers!');
+
+      ambers -= amount;
+      saveUserData();
+
+      let targetData = getUserDataRaw(targetUsername);
+      if (targetData) {
+        targetData.embers = (targetData.embers || 0) + amount;
+        saveUserDataRaw(targetUsername, targetData);
+      }
+
+      updateUserUI();
+      if (currentlyViewingUser) viewUserProfile(currentlyViewingUser);
+      alert(`Successfully gifted ${amount} Embers to ${targetUsername}! 🔥`);
+    }
+
     /* VIEW ANY USER PROFILE SYSTEM */
     function viewUserProfile(targetUsername) {
       if (!targetUsername) return;
@@ -965,17 +1194,14 @@
         targetData = {
           username: currentUser, bio: userBio, profilePicUrl: profilePicUrl, embers: embers, loginStreak: loginStreak,
           equippedBorder: equippedBorder, equippedNameStyle: equippedNameStyle,
-          userBadges: userBadges, favoritedGameIds: favoritedGameIds
+          userBadges: userBadges, favoritedGameIds: favoritedGameIds, friendsList: friendsList
         };
       } else {
-        const saved = localStorage.getItem('emsite_user_' + targetUsername.toLowerCase());
-        if (saved) { 
-          try { targetData = JSON.parse(saved); } catch(e){} 
-        }
+        targetData = getUserDataRaw(targetUsername);
       }
 
       if (!targetData) {
-        targetData = { username: targetUsername, bio: "No bio set.", profilePicUrl: null, embers: 0, loginStreak: 1, equippedBorder: '', equippedNameStyle: 'u-default', userBadges: [], favoritedGameIds: [] };
+        targetData = { username: targetUsername, bio: "No bio set.", profilePicUrl: null, embers: 0, loginStreak: 1, equippedBorder: '', equippedNameStyle: 'u-default', userBadges: [], favoritedGameIds: [], friendsList: [] };
       }
 
       document.getElementById('profileViewHeading').innerText = isOwnProfile ? "Your Account Dashboard" : targetData.username + "'s Profile";
@@ -997,6 +1223,8 @@
       document.getElementById('streakVal').innerText = targetData.loginStreak || 1;
 
       const pfpControls = document.getElementById('pfpUploadControls');
+      const actionBtnsContainer = document.getElementById('profileActionBtns');
+      actionBtnsContainer.innerHTML = '';
 
       if (isOwnProfile) {
         if (pfpControls) pfpControls.style.display = 'flex';
@@ -1014,6 +1242,41 @@
         document.getElementById('publicBioText').style.display = 'block';
         document.getElementById('publicBioText').innerText = targetData.bio || "No bio set.";
         document.getElementById('logoutSection').style.display = 'none';
+
+        // Action Buttons on Profile
+        if (currentUser) {
+          const isFriend = friendsList.includes(targetData.username);
+          const hasReceivedReq = friendRequestsReceived.includes(targetData.username);
+          const hasSentReq = friendRequestsSent.includes(targetData.username);
+
+          if (isFriend) {
+            actionBtnsContainer.innerHTML += `<button class="success" disabled>Friends ✓</button>`;
+          } else if (hasReceivedReq) {
+            actionBtnsContainer.innerHTML += `<button class="primary" onclick="acceptFriendRequest('${targetData.username}')">Accept Request</button>`;
+          } else if (hasSentReq) {
+            actionBtnsContainer.innerHTML += `<button disabled>Pending Request...</button>`;
+          } else {
+            actionBtnsContainer.innerHTML += `<button class="primary" onclick="sendFriendRequest('${targetData.username}')">+ Add Friend</button>`;
+          }
+
+          actionBtnsContainer.innerHTML += `<button onclick="giftEmbers('${targetData.username}')">🔥 Gift Embers</button>`;
+        }
+      }
+
+      // Render Friends List
+      const friendsContainer = document.getElementById('profileFriendsList');
+      friendsContainer.innerHTML = '';
+      const list = targetData.friendsList || [];
+      if (list.length === 0) {
+        friendsContainer.innerHTML = '<p style="color: var(--text-muted);">No friends added yet.</p>';
+      } else {
+        list.forEach(f => {
+          const chip = document.createElement('div');
+          chip.style.cssText = 'background:#181818; padding: 6px 12px; border:1px solid #444; border-radius:3px; cursor:pointer;';
+          chip.onclick = () => viewUserProfile(f);
+          chip.innerText = '👤 ' + f;
+          friendsContainer.appendChild(chip);
+        });
       }
 
       // Created Games Section
@@ -1270,28 +1533,46 @@
       }
 
       filtered.forEach(u => {
-        const savedData = localStorage.getItem('emsite_user_' + u.username.toLowerCase());
+        const savedData = getUserDataRaw(u.username);
         let border = '', nameStyle = 'u-default', targetPfp = null;
         if (savedData) {
-          try {
-            const parsed = JSON.parse(savedData);
-            border = parsed.equippedBorder || '';
-            nameStyle = parsed.equippedNameStyle || 'u-default';
-            targetPfp = parsed.profilePicUrl || null;
-          } catch(e) {}
+          border = savedData.equippedBorder || '';
+          nameStyle = savedData.equippedNameStyle || 'u-default';
+          targetPfp = savedData.profilePicUrl || null;
         }
 
         const card = document.createElement('div');
         card.className = 'user-card';
-        card.onclick = () => viewUserProfile(u.username);
         
         const avatarContent = targetPfp 
           ? `<img src="${targetPfp}" alt="${u.username}" />` 
           : u.username.charAt(0).toUpperCase();
 
+        const isSelf = currentUser && currentUser.toLowerCase() === u.username.toLowerCase();
+        const isFriend = friendsList.includes(u.username);
+        const hasReceivedReq = friendRequestsReceived.includes(u.username);
+        const hasSentReq = friendRequestsSent.includes(u.username);
+
+        let actionHtml = '';
+        if (currentUser && !isSelf) {
+          if (isFriend) {
+            actionHtml += `<button class="success" disabled>Friends ✓</button>`;
+          } else if (hasReceivedReq) {
+            actionHtml += `<button class="primary" onclick="acceptFriendRequest('${u.username}')">Accept</button>`;
+          } else if (hasSentReq) {
+            actionHtml += `<button disabled>Pending...</button>`;
+          } else {
+            actionHtml += `<button class="primary" onclick="sendFriendRequest('${u.username}')">+ Friend</button>`;
+          }
+          actionHtml += `<button onclick="giftEmbers('${u.username}')">🔥 Gift</button>`;
+        }
+
         card.innerHTML = `
-          <div class="avatar-box ${border}">${avatarContent}</div>
-          <div><span class="${nameStyle}" style="font-size: 13px;">${u.username}</span></div>
+          <div class="user-card-header" onclick="viewUserProfile('${u.username}')">
+            <div class="avatar-box ${border}">${avatarContent}</div>
+            <div><span class="${nameStyle}" style="font-size: 13px;">${u.username}</span></div>
+          </div>
+          ${actionHtml ? `<div class="user-card-actions">${actionHtml}</div>` : ''}
         `;
         grid.appendChild(card);
       });
@@ -1307,18 +1588,15 @@
       game.views = (game.views || 0) + 1;
       game.embersEarned = (game.embersEarned || 0) + 5;
 
-      const authorSaved = localStorage.getItem('emsite_user_' + game.author.toLowerCase());
+      const authorSaved = getUserDataRaw(game.author);
       if (authorSaved) {
-        try {
-          let authorData = JSON.parse(authorSaved);
-          authorData.embers = (authorData.embers || 0) + 5;
-          localStorage.setItem('emsite_user_' + game.author.toLowerCase(), JSON.stringify(authorData));
+        authorSaved.embers = (authorSaved.embers || 0) + 5;
+        saveUserDataRaw(game.author, authorSaved);
 
-          if (currentUser && currentUser.toLowerCase() === game.author.toLowerCase()) {
-            embers = authorData.embers;
-            updateUserUI();
-          }
-        } catch(e) {}
+        if (currentUser && currentUser.toLowerCase() === game.author.toLowerCase()) {
+          embers = authorSaved.embers;
+          updateUserUI();
+        }
       }
 
       saveGamesData();
@@ -1641,6 +1919,37 @@
         renderAdminPage();
         alert("Comments cleared.");
       }
+    }
+
+    /* EMBER STOREFRONT & PAYMENT SIMULATION */
+    function openEmberPurchaseModal() {
+      if (!currentUser) return alert('Please sign in to purchase Embers.');
+      document.getElementById('purchaseStep1').style.display = 'block';
+      document.getElementById('purchaseStep2').style.display = 'none';
+      document.getElementById('emberPurchaseModal').style.display = 'flex';
+    }
+
+    function closeEmberPurchaseModal() {
+      document.getElementById('emberPurchaseModal').style.display = 'none';
+    }
+
+    function startPurchaseFlow() {
+      // Step 1: Open Simulated Checkout (External popup)
+      document.getElementById('purchaseStep1').style.display = 'none';
+      document.getElementById('purchaseStep2').style.display = 'block';
+      
+      // Simulate external window opening
+      console.log("[EMSITE PAYMENTS] Opening secure checkout window for 1000 Embers ($1.50)...");
+      // In a real app, you would use window.open('payment_url') here.
+    }
+
+    function completeSimulatedPurchase() {
+      // Step 2: Simulate Payment Success Callback
+      embers += 1000;
+      saveUserData(); // UPDATE: Economy data field now encrypted during standard save flow
+      closeEmberPurchaseModal();
+      updateUserUI();
+      alert(`Success! 1000 Embers 🔥 have been added to your account.`);
     }
 
     // App Initialization Sequence
